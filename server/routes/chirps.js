@@ -8,13 +8,28 @@ router.get('/:id?', (req, res) => {
     if (id) {
         res.json(chirpsStore.GetChirp(id));
     } else {
-        res.send(chirpsStore.GetChirps());
+        const rawChirps = chirpsStore.GetChirps();
+        delete rawChirps.nextid;
+        const chirpArr = Object.keys(rawChirps).map(key => ({ id: key, ...rawChirps[key] }));
+        res.json(chirpArr);
     }
 });
 
 router.post('/', (req, res) => {
     chirpsStore.CreateChirp(req.body);
-    res.sendStatus(200);
+    res.json({ message: "Successfully created chirp" });
+});
+
+router.put('/:id', (req, res) => {
+    let id = req.params.id;
+    chirpsStore.UpdateChirp(id, req.body);
+    res.json({ message: "Successfully edited chirp" });
+});
+
+router.delete('/:id', (req, res) => {
+    let id = req.params.id;
+    chirpsStore.DeleteChirp(id);
+    res.json({ message: "Successfully deleted chirp" });
 });
 
 module.exports = router;
